@@ -1,9 +1,11 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View } from 'react-native'
-import ImageViewer from './ImageViewer'
-import Button from './Button'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
+
+import ImageViewer from './ImageViewer'
+import Button from './Button'
 import IconButton from './components/buttons/IconButton'
 import CircleButton from './components/buttons/CircleButton'
 import EmojiPicker from './components/emojis/EmojiPicker'
@@ -21,6 +23,7 @@ export default function App() {
 	const onReset = () => {
 		setShowOptions(false)
 		setSelected(null)
+		setSelectedEmoji(null)
 	}
 
 	const onAddSticker = () => {
@@ -46,7 +49,7 @@ export default function App() {
 	}
 
 	return (
-		<View style={styles.container}>
+		<GestureHandlerRootView style={styles.container}>
 			<ImageViewer placeholder={PlaceholderImage} selected={selected} />
 			{selectedEmoji && (
 				<EmojiSticker imageSize={40} stickerSource={selectedEmoji} />
@@ -84,7 +87,7 @@ export default function App() {
 				/>
 			</EmojiPicker>
 			<StatusBar style='auto' />
-		</View>
+		</GestureHandlerRootView>
 	)
 }
 
