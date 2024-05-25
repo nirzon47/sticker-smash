@@ -3,18 +3,10 @@ import { Image, StyleSheet, View } from 'react-native'
 const ImageViewer = ({ placeholder, selected }) => {
 	const imageSource = selected ? { uri: selected } : placeholder
 
-	return (
-		<View style={styles.imageContainer}>
-			<Image source={imageSource} style={styles.image} />
-		</View>
-	)
+	return <Image source={imageSource} style={styles.image} />
 }
 
 const styles = StyleSheet.create({
-	imageContainer: {
-		flex: 1,
-		paddingTop: 58,
-	},
 	image: {
 		width: 320,
 		height: 440,

@@ -1,8 +1,10 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { captureRef } from 'react-native-view-shot'
 import * as ImagePicker from 'expo-image-picker'
-import { useState } from 'react'
+import * as MediaLibrary from 'expo-media-library'
+import { useRef, useState } from 'react'
 
 import ImageViewer from './ImageViewer'
 import Button from './Button'
@@ -19,6 +21,12 @@ export default function App() {
 	const [showOptions, setShowOptions] = useState(false)
 	const [isModalVisible, setIsModalVisible] = useState(false)
 	const [selectedEmoji, setSelectedEmoji] = useState(null)
+	const [status, requestPermission] = MediaLibrary.usePermissions()
+	const imageRef = useRef(null)
+
+	if (status === null) {
+		requestPermission()
+	}
 
 	const onReset = () => {
 		setShowOptions(false)
@@ -31,7 +39,19 @@ export default function App() {
 	}
 
 	const onSaveImageAsync = async () => {
-		setIsModalVisible(false)
+		try {
+			const localUri = await captureRef(imageRef, {
+				height: 440,
+				quality: 1,
+			})
+
+			await MediaLibrary.saveToLibraryAsync(localUri)
+			if (localUri) {
+				alert('Saved!')
+			}
+		} catch (e) {
+			console.log(e)
+		}
 	}
 
 	const pickImageAsync = async () => {
@@ -50,10 +70,17 @@ export default function App() {
 
 	return (
 		<GestureHandlerRootView style={styles.container}>
-			<ImageViewer placeholder={PlaceholderImage} selected={selected} />
-			{selectedEmoji && (
-				<EmojiSticker imageSize={40} stickerSource={selectedEmoji} />
-			)}
+			<View style={styles.imageContainer}>
+				<View ref={imageRef} collapsable={false}>
+					<ImageViewer
+						placeholder={PlaceholderImage}
+						selected={selected}
+					/>
+					{selectedEmoji && (
+						<EmojiSticker imageSize={40} stickerSource={selectedEmoji} />
+					)}
+				</View>
+			</View>
 			{showOptions ? (
 				<View style={styles.optionsContainer}>
 					<View style={styles.optionsRow}>
@@ -96,6 +123,10 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#25292e',
 		alignItems: 'center',
+	},
+	imageContainer: {
+		flex: 1,
+		paddingTop: 58,
 	},
 	footerContainer: {
 		flex: 1 / 3,
